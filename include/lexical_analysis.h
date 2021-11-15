@@ -8,6 +8,7 @@
 #include <string>
 #include <fstream>
 #include <vector>
+#include <set>
 
 using namespace std;
 
@@ -29,17 +30,11 @@ private:
     std::string token;
     const char *p;
     LEXICAL_RESULT result;
-    vector<std::string> keyword;
+    std::set<std::string> keyword = {"do", "while", "if", "else", "then"};
 
 public:
     explicit LexicalAnalysis(const std::string &filename)
             : fin(filename, ios_base::in), p(nullptr), result(ERROR) {
-        keyword = {"do",
-                   "while"
-                   "if",
-                   "then",
-                   "else",
-        };
     }
 
     bool next() {
@@ -51,7 +46,7 @@ public:
             return false;
         }
 
-        tokenInit();
+        token_init();
 
         if (isalpha(*p)) {
             add();
@@ -94,11 +89,11 @@ public:
         return true;
     }
 
-    LEXICAL_RESULT get_result() const {
+    inline LEXICAL_RESULT get_result() const {
         return result;
     }
 
-    std::string get_token() const {
+    inline std::string get_token() const {
         return token;
     }
 
@@ -124,8 +119,8 @@ private:
         }
     }
 
-    void tokenInit() {
-        token.erase(token.cbegin() ,token.cend());
+    void token_init() {
+        token.erase(token.cbegin(), token.cend());
     }
 
     inline void add() {
@@ -133,7 +128,7 @@ private:
     }
 
     inline bool iskeyword() const {
-        return find(keyword.begin(), keyword.end(), get_token()) != keyword.end();
+        return keyword.contains(get_token());
     }
 
     static inline bool is_oct(const char ch) {
@@ -141,7 +136,7 @@ private:
     }
 
     static inline bool is_hex(const char ch) {
-        return (ch >= '0' && ch <= '9' ) || (ch >= 'a' && ch <= 'f');
+        return (ch >= '0' && ch <= '9') || (ch >= 'a' && ch <= 'f');
     }
 };
 

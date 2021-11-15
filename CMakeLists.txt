@@ -7,4 +7,4 @@ include_directories(include)
 
 aux_source_directory(src DIR_SRC)
 
-add_executable(compiler_principle_experiment ${DIR_SRC})
+add_executable(compiler_principle_experiment src/lexical_analysis.cpp)
