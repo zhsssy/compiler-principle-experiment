@@ -12,6 +12,7 @@
 
 using namespace std;
 
+
 enum LEXICAL_RESULT {
     ERROR = -1,
     IDENTIFICATION = 0,

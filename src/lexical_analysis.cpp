@@ -1,3 +1,4 @@
+//
 // Created by zhsssy on 2021.11.15.
 //
 
@@ -14,7 +15,7 @@ int main(int argc, char *argv[]) {
     LexicalAnalysis l("../resource/output.txt");
 
     if (!l.is_open()) {
-        cout << "Can't open " << argv[1] << endl;
+        cout << "Can't open file." << endl;
         exit(EXIT_FAILURE);
     }
 

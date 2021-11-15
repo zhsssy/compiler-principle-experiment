@@ -7,4 +7,4 @@ include_directories(include)
 
 aux_source_directory(src DIR_SRC)
 
-add_executable(compiler_principle_experiment ${DIR_SRC})
+add_executable(compiler_principle_experiment ${DIR_SRC} src/ll1_programmer.cpp include/ll1_programmer.h)
