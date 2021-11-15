@@ -11,7 +11,7 @@ int main(int argc, char *argv[]) {
     string token, s;
     LEXICAL_RESULT result;
 
-    LexicalAnalysisMachine l("../resource/output.txt");
+    LexicalAnalysis l("../resource/output.txt");
 
     if (!l.is_open()) {
         cout << "Can't open " << argv[1] << endl;

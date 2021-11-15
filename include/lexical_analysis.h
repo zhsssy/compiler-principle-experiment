@@ -22,7 +22,7 @@ enum LEXICAL_RESULT {
 };
 
 
-class LexicalAnalysisMachine {
+class LexicalAnalysis {
 private:
     ifstream fin;
     std::string tmp;
@@ -32,7 +32,7 @@ private:
     vector<std::string> keyword;
 
 public:
-    explicit LexicalAnalysisMachine(const std::string &filename)
+    explicit LexicalAnalysis(const std::string &filename)
             : fin(filename, ios_base::in), p(nullptr), result(ERROR) {
         keyword = {"do",
                    "while"
@@ -125,23 +125,23 @@ private:
     }
 
     void tokenInit() {
-        token.erase(token.cbegin(), token.cend());
+        token.erase(token.cbegin() ,token.cend());
     }
 
     inline void add() {
         token += *p++;
     }
 
-    bool iskeyword() const {
+    inline bool iskeyword() const {
         return find(keyword.begin(), keyword.end(), get_token()) != keyword.end();
     }
 
     static inline bool is_oct(const char ch) {
-        return ch < '8' && ch >= '0';
+        return ch >= '0' && ch < '8';
     }
 
     static inline bool is_hex(const char ch) {
-        return (ch <= '9' && ch > '1') || (ch <= 'f' && ch >= 'a');
+        return (ch >= '0' && ch <= '9' ) || (ch >= 'a' && ch <= 'f');
     }
 };
 
