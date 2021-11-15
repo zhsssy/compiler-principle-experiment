@@ -1,7 +1,7 @@
 // Created by zhsssy on 2021.11.15.
 //
 
-#include "../include/lexical_analysis.h"
+#include <lexical_analysis.h>
 
 #include <iostream>
 #include <string>
