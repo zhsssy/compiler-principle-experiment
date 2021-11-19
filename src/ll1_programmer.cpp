@@ -6,9 +6,9 @@
 #include <lexical_analysis.h>
 
 int main() {
-    LL1Programmer ll1;
+    LL1Programmer ll1("../resource/expression.txt");
 
-    LexicalAnalysis lex("../resource/expression.txt");
-
-
+    while (ll1.next()) {
+        cout << ll1.get_answer() << endl;
+    }
 }
