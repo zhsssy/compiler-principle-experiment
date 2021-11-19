@@ -21,7 +21,6 @@ private :
     LEXICAL_RESULT result;
     string answer;
     char *p{};
-    string temp;
 
 
 public:
@@ -32,14 +31,13 @@ public:
         return answer;
     }
 
+    // 调取词法分析
     bool next() {
-        while ((p == nullptr && *p == 0) && (getline(fin, temp))) {
-
-        }
+        clear_stack();
         return false;
     }
 
-    // 10进制 8进制 16进制 标识符 都可以为输入
+    // 10进制 8进制 16进制 标识符
     static bool is_input(LEXICAL_RESULT r) {
         return r == LEXICAL_RESULT::HEX
                || r == LEXICAL_RESULT::OCT
@@ -59,13 +57,11 @@ public:
     }
 
     void init_input_stack() {
-        while (!p) {
-            string tmp(1, *p++);
-            input_stack.push(tmp);
-        }
 
     }
 
+    // 逐句读取 -》 通过词法分析器转换为 LEXICAL_RESULT 组成的标识符 -》输入 stack 判断
+    // 数字 / 小写字母   转换为 i 便于分析
     // 给定符号串 判定输入串 r result
     void judge(const string &token, LEXICAL_RESULT r) {
         if (symbol_stack.top() == "E" && (is_input(result) || (is_key(result) && token == "("))) {
