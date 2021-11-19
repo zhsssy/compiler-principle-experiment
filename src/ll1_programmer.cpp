@@ -3,3 +3,12 @@
 //
 
 #include <ll1_programmer.h>
+#include <lexical_analysis.h>
+
+int main() {
+    LL1Programmer ll1;
+
+    LexicalAnalysis lex("../resource/expression.txt");
+
+
+}
