@@ -16,68 +16,104 @@ using namespace std;
 class LL1Programmer {
 private :
     std::ifstream fin;
-    std::stack<string> symbol_stack;
-    std::stack<string> input_stack;
+    stack<string> symbol_stack;
+    stack<string> input_stack;
     LEXICAL_RESULT result;
     string answer;
-    char *p{};
 
 
 public:
     explicit LL1Programmer()
-            : result(ERROR) {}
+            : result(ERROR) { clear_stack(); }
 
 
     // 调取词法分析器
-    bool next() {
-        LexicalAnalysis lexical_analysis("../resource/expression.txt");
-        while (lexical_analysis.next()) {
-            if (lexical_analysis.get_token() == ";") {
-                // 到句末后开始判断 当前是否为符合文法的句子
-                judge();
-                cout << answer << endl;
-                // 清空 input 和 symbol 栈 开始下一次
+    void next() {
+//        LexicalAnalysis lexical_analysis("../resource/expression.txt");
+        LexicalAnalysis l("../resource/expression.txt");
+        if (!l.is_open()) {
+            cout << "Can't open file." << endl;
+            exit(EXIT_FAILURE);
+        }
+        while (l.next()) {
+            result = l.get_result();
+//            cout << "the result is" << result << endl;
+            if (l.get_token() == ";") {
+//                // 到句末后开始判断 当前是否为符合文法的句子
+//                // TODO: judge() 逻辑部分存在问题 死循环
+//                judge();
+//                // 输出结果
+//                cout << "answer is " << answer << endl;
+//                // 清空 input 和 symbol 栈 开始下一次
+                while (!input_stack.empty()) {
+//                    cout << "input stack :" << input_stack.top() << endl;
+                    if (input_stack.top() == "#") {
+                        break;
+                    }
+                    cout << input_stack.top();
+                    input_stack.pop();
+                }
+//                while (!symbol_stack.empty()) {
+////                    cout << "symbol_stack:" << symbol_stack.top() << endl;
+//                    if (symbol_stack.top() == "#") {
+//                        break;
+//                    }
+//                    cout << symbol_stack.top();
+//                    symbol_stack.pop();
+//                }
                 clear_stack();
-                continue;
+//                continue;
+                cout << endl;
+//                cout << "next time !!! " << endl;
             }
-            // 保存临时结果
-            LEXICAL_RESULT la_temp = lexical_analysis.get_result();
+            // 保存临时结果  判断推入 input_stack 栈中的词法类型
+            LEXICAL_RESULT la_temp = l.get_result();
+            // 将数字转换为 i ，便于分析
             if (is_input(la_temp)) {
                 input_stack.push("i");
             }
             if (is_key(la_temp)) {
-                input_stack.push(lexical_analysis.get_token());
+                input_stack.push(l.get_token());
             }
         }
-        return false;
     }
-
 
     // 逐句读取 -》 通过词法分析器转换为 LEXICAL_RESULT 组成的标识符 -》输入 stack 判断
     // 数字 / 小写字母   转换为 i 便于分析
     // 给定符号串 判定输入串 r result
     // TODO: 简化代码
+
+    void pop_same() {
+        while (symbol_stack.top() == input_stack.top())
+            symbol_stack.pop(), input_stack.pop();
+    }
+
     void judge() {
         while (symbol_stack.top() != "#") {
-            if (symbol_stack.top() == "E" && (is_input(result) || (is_key(result) && input_stack.top() == "("))) {
+            if (symbol_stack.top() == "E" && (input_stack.top() == "i" || input_stack.top() == "(")) {
                 symbol_stack.pop();
                 symbol_stack.push("E1");
                 symbol_stack.push("T");
+                pop_same();
             }
             if (symbol_stack.top() == "E1") {
-                if (input_stack.top() == "+ ") {
+                if (input_stack.top() == "+") {
                     symbol_stack.pop();
                     symbol_stack.push("E1");
                     symbol_stack.push("T");
                     symbol_stack.push("+");
+                    pop_same();
                 }
                 if (input_stack.top() == "(" || input_stack.top() == "#") {
                     symbol_stack.pop();
+                    pop_same();
                 }
             }
-            if (symbol_stack.top() == "T" && (is_input(result) || (is_key(result) && input_stack.top() == "("))) {
+            if (symbol_stack.top() == "T" && (input_stack.top() == "i" || input_stack.top() == "(")) {
+                symbol_stack.pop();
                 symbol_stack.push("T1");
                 symbol_stack.push("F");
+                pop_same();
             }
             if (symbol_stack.top() == "T1") {
                 if (input_stack.top() == "*") {
@@ -85,25 +121,33 @@ public:
                     symbol_stack.push("T1");
                     symbol_stack.push("F");
                     symbol_stack.push("*");
+                    pop_same();
                 }
                 if (input_stack.top() == ")" || input_stack.top() == "#" || input_stack.top() == "+") {
                     symbol_stack.pop();
+                    pop_same();
                 }
             }
             if (symbol_stack.top() == "F") {
-                if (is_input(result)) {
+                if (input_stack.top() == "i") {
                     symbol_stack.pop();
-                    symbol_stack.push(input_stack.top());
+                    symbol_stack.push("i");
+                    pop_same();
                 }
                 if (input_stack.top() == "(") {
                     symbol_stack.pop();
                     symbol_stack.push(")");
                     symbol_stack.push("E");
                     symbol_stack.push("(");
+                    pop_same();
                 }
             }
-            if (symbol_stack.top() == "#" && input_stack.top() == "#")
+            // 同时推出相同的符号 （标识符） i + - * / ( )
+
+            if (symbol_stack.empty() && input_stack.empty()) {
                 this->answer = "成功";
+                break;
+            }
         }
     }
 
@@ -124,6 +168,8 @@ public:
     void clear_stack() {
         stack<std::string>().swap(input_stack);
         stack<std::string>().swap(symbol_stack);
+        input_stack.push("#");
+        symbol_stack.push("#");
         symbol_stack.push("E");
     }
 
