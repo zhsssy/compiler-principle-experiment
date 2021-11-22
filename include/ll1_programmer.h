@@ -18,31 +18,27 @@ class LL1Programmer {
 private :
     stack<string> symbol;
     queue<string> input;
-    LEXICAL_RESULT result;
     bool if_end;
-    string answer;
-
+    bool answer;
 
 public:
     explicit LL1Programmer()
-            : result(ERROR) { clear_stack(); }
-
+            : if_end(false), answer(false) { init(); }
 
     // 调取词法分析器
-    void next() {
+    void analysis() {
         LexicalAnalysis l("../resource/expression.txt");
         if (!l.is_open()) {
             cout << "Can't open file." << endl;
             exit(EXIT_FAILURE);
         }
         while (l.next()) {
-            result = l.get_result();
             if (l.get_token() == ";") {
                 // 到句末后开始判断 当前是否为符合文法的句子
                 input.push("#");
                 /* 这部分代码用于 debug
                 queue<string> temp = input;
-//                cout << "start to print input" << endl;
+                cout << "start to print input" << endl;
                 while (!temp.empty()) {
                     // debug： 排除 # 和 ; 不打印
                     if (temp.front() == "#" && temp.front() == ";") {
@@ -51,12 +47,12 @@ public:
                     cout << temp.front();
                     temp.pop();
                 }
-                cout << endl;
+                cout << endl << endl;
                  */
                 judge();
                 // 清空 input 和 symbol 开始下一次
-                clear_stack();
-//                cout << endl;
+                cout << (get_answer() ? "success" : "failed") << endl;
+                init();
             }
 
             // 保存临时结果  判断推入 input 栈中的词法类型
@@ -94,17 +90,43 @@ public:
         input.pop(), symbol.pop();
     }
 
+    // 10进制 8进制 16进制 标识符
+    static bool is_input(LEXICAL_RESULT r) {
+        return r == LEXICAL_RESULT::HEX
+               || r == LEXICAL_RESULT::OCT
+               || r == LEXICAL_RESULT::DIGIT
+               || r == LEXICAL_RESULT::IDENTIFICATION;
+    }
+
+    // 为 运算符 或 界符
+    static bool is_key(LEXICAL_RESULT r) {
+        return r == LEXICAL_RESULT::KEY;
+    }
+
+    // 清空 stack 开始下个句子分析
+    void init() {
+        queue<std::string>().swap(input);
+        stack<std::string>().swap(symbol);
+        symbol.push("#");
+        symbol.push("E");
+        this->answer = false;
+    }
+
+    bool get_answer() const {
+        return answer;
+    }
+
     void judge() {
         while (!symbol.empty()) {
             if_end = false;
             if (symbol.top() == "#") {
                 if (input.front() == "#") {
-//                    this->answer = "success";
-                    cout << "success" << endl;
+                    this->answer = true;
+//                    cout << "success" << endl;
                     break;
                 } else {
-                    cout << "failed" << endl;
-//                    this->answer = "failed";
+//                    cout << "failed" << endl;
+                    this->answer = false;
                     break;
                 }
             }
@@ -177,32 +199,6 @@ public:
             }
         }
         // 根据 ll1 分析表 推出
-    }
-
-
-    // 10进制 8进制 16进制 标识符
-    static bool is_input(LEXICAL_RESULT r) {
-        return r == LEXICAL_RESULT::HEX
-               || r == LEXICAL_RESULT::OCT
-               || r == LEXICAL_RESULT::DIGIT
-               || r == LEXICAL_RESULT::IDENTIFICATION;
-    }
-
-    // 为 运算符 或 界符
-    static bool is_key(LEXICAL_RESULT r) {
-        return r == LEXICAL_RESULT::KEY;
-    }
-
-    // 清空 stack 开始下个句子分析
-    void clear_stack() {
-        queue<std::string>().swap(input);
-        stack<std::string>().swap(symbol);
-        symbol.push("#");
-        symbol.push("E");
-    }
-
-    string get_answer() {
-        return answer;
     }
 
 };

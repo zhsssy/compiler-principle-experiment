@@ -7,7 +7,7 @@
 int main() {
     LL1Programmer ll1;
 
-    ll1.next();
+    ll1.analysis();
 //    cout << ll1.get_answer() << endl;
 }
 
