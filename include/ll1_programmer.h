@@ -19,6 +19,7 @@ private :
     stack<string> symbol;
     queue<string> input;
     LEXICAL_RESULT result;
+    bool if_end;
     string answer;
 
 
@@ -38,10 +39,10 @@ public:
             result = l.get_result();
             if (l.get_token() == ";") {
                 // 到句末后开始判断 当前是否为符合文法的句子
-                // TODO: judge() 逻辑部分存在问题 死循环
                 input.push("#");
+                /* 这部分代码用于 debug
                 queue<string> temp = input;
-                cout << "start to print input" << endl;
+//                cout << "start to print input" << endl;
                 while (!temp.empty()) {
                     // debug： 排除 # 和 ; 不打印
                     if (temp.front() == "#" && temp.front() == ";") {
@@ -51,11 +52,11 @@ public:
                     temp.pop();
                 }
                 cout << endl;
+                 */
                 judge();
-                // 输出结果
-                // 清空 input 和 symbol 栈 开始下一次
+                // 清空 input 和 symbol 开始下一次
                 clear_stack();
-                cout << endl;
+//                cout << endl;
             }
 
             // 保存临时结果  判断推入 input 栈中的词法类型
@@ -72,28 +73,30 @@ public:
     // 逐句读取 -》 通过词法分析器转换为 LEXICAL_RESULT 组成的标识符 -》输入 stack 判断
     // 数字 / 小写字母   转换为 i 便于分析
     // 给定符号串 判定输入串 r result
-    // TODO: 简化代码
 
     // debug
-    void print_stack() {
+    void print_symbol_input() {
         stack<string> temp_symbol = symbol;
         queue<string> temp_input = input;
-        cout << "symbol: ";
+        cout << endl << "symbol: ";
         while (!temp_symbol.empty()) {
             cout << temp_symbol.top();
             temp_symbol.pop();
         }
-        cout << endl;
-        cout << "input: ";
+        cout << endl << "input: ";
         while (!temp_input.empty()) {
             cout << temp_input.front();
             temp_input.pop();
         }
-        cout << endl;
+    }
+
+    inline void pop_together() {
+        input.pop(), symbol.pop();
     }
 
     void judge() {
         while (!symbol.empty()) {
+            if_end = false;
             if (symbol.top() == "#") {
                 if (input.front() == "#") {
 //                    this->answer = "success";
@@ -107,79 +110,75 @@ public:
             }
             if (symbol.top() == "E" && (input.front() == "i" || input.front() == "(")) {
                 symbol.pop();
-                symbol.push("E1");
+                symbol.push("E'");
                 symbol.push("T");
-                print_stack();
+//                print_symbol_input();
+                if_end = true;
             }
-            if (symbol.top() == "E1") {
+            if (symbol.top() == "E'") {
                 if (input.front() == "+") {
-                    symbol.pop();
-                    input.pop();
-                    symbol.push("E1");
+                    pop_together();
+                    symbol.push("E'");
                     symbol.push("T");
-                    print_stack();
+//                    print_symbol_input();
+                    if_end = true;
                 }
                 if (input.front() == ")" || input.front() == "#") {
                     symbol.pop();
                     if (symbol.size() > 1 && input.size() > 1 && symbol.top() == input.front()) {
                         symbol.pop(), input.pop();
                     }
-                    print_stack();
+//                    print_symbol_input();
+                    if_end = true;
                 }
             }
             if (symbol.top() == "T" && (input.front() == "i" || input.front() == "(")) {
                 symbol.pop();
-                symbol.push("T1");
+                symbol.push("T'");
                 symbol.push("F");
-                print_stack();
+//                print_symbol_input();
+                if_end = true;
             }
-            if (symbol.top() == "T1") {
+            if (symbol.top() == "T'") {
                 if (input.front() == "*") {
-                    symbol.pop();
-                    input.pop();
-                    symbol.push("T1");
+                    pop_together();
+                    symbol.push("T'");
                     symbol.push("F");
-                    print_stack();
+//                    print_symbol_input();
+                    if_end = true;
                 }
                 if (input.front() == ")" || input.front() == "#" || input.front() == "+") {
                     symbol.pop();
                     if (symbol.size() > 1 && input.size() > 1 && symbol.top() == input.front()) {
                         symbol.pop(), input.pop();
                     }
-                    print_stack();
+//                    print_symbol_input();
+                    if_end = true;
                 }
             }
             if (symbol.top() == "F") {
                 if (input.front() == "i") {
-                    symbol.pop();
-                    input.pop();
-                    print_stack();
+                    pop_together();
+//                    print_symbol_input();
+                    if_end = true;
                 }
                 if (input.front() == "(") {
-                    symbol.pop();
-                    input.pop();
+                    pop_together();
                     symbol.push(")");
                     symbol.push("E");
-                    print_stack();
+//                    print_symbol_input();
+                    if_end = true;
                 }
-                if (input.front() == "#") {
-                    string strs = symbol.top();
-                    cout << "strs is " << strs << endl;
-                    if (is_symbol_top_key(strs)) {
-                        cout << "failed" << endl;
-                        break;
-                    }
-                }
+            }
 
+            if (!if_end) {
+                cout << "failed" << endl;
+                break;
             }
         }
         // 根据 ll1 分析表 推出
     }
 
-    static bool is_symbol_top_key(const string &a) {
-        cout << "now start compare" << endl;
-        return a == "(" || a == ")" || a == "+" || a == "-" || a == "*" || a == "/";
-    }
 
     // 10进制 8进制 16进制 标识符
     static bool is_input(LEXICAL_RESULT r) {

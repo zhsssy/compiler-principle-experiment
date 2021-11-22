@@ -3,12 +3,11 @@
 //
 
 #include <ll1_programmer.h>
-#include <lexical_analysis.h>
 
 int main() {
     LL1Programmer ll1;
 
     ll1.next();
-    cout << ll1.get_answer() << endl;
+//    cout << ll1.get_answer() << endl;
 }
 
