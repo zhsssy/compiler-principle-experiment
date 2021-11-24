@@ -36,7 +36,8 @@ public:
             if (l.get_token() == ";") {
                 // 到句末后开始判断 当前是否为符合文法的句子
                 input.push("#");
-                /* 这部分代码用于 debug
+                //这部分代码用于 debug
+#ifdef DEBUG
                 queue<string> temp = input;
                 cout << "start to print input" << endl;
                 while (!temp.empty()) {
@@ -48,7 +49,7 @@ public:
                     temp.pop();
                 }
                 cout << endl << endl;
-                 */
+#endif
                 judge();
                 // 清空 input 和 symbol 开始下一次
                 cout << (get_answer() ? "success" : "failed") << endl;
@@ -122,10 +123,8 @@ public:
             if (symbol.top() == "#") {
                 if (input.front() == "#") {
                     this->answer = true;
-//                    cout << "success" << endl;
                     break;
                 } else {
-//                    cout << "failed" << endl;
                     this->answer = false;
                     break;
                 }
@@ -134,7 +133,9 @@ public:
                 symbol.pop();
                 symbol.push("E'");
                 symbol.push("T");
-//                print_symbol_input();
+#ifdef DEBUG
+                print_symbol_input();
+#endif
                 if_end = true;
             }
             if (symbol.top() == "E'") {
@@ -142,7 +143,9 @@ public:
                     pop_together();
                     symbol.push("E'");
                     symbol.push("T");
-//                    print_symbol_input();
+#ifdef DEBUG
+                    print_symbol_input();
+#endif
                     if_end = true;
                 }
                 if (input.front() == ")" || input.front() == "#") {
@@ -150,7 +153,9 @@ public:
                     if (symbol.size() > 1 && input.size() > 1 && symbol.top() == input.front()) {
                         symbol.pop(), input.pop();
                     }
-//                    print_symbol_input();
+#ifdef DEBUG
+                    print_symbol_input();
+#endif
                     if_end = true;
                 }
             }
@@ -158,7 +163,9 @@ public:
                 symbol.pop();
                 symbol.push("T'");
                 symbol.push("F");
-//                print_symbol_input();
+#ifdef DEBUG
+                print_symbol_input();
+#endif
                 if_end = true;
             }
             if (symbol.top() == "T'") {
@@ -166,7 +173,9 @@ public:
                     pop_together();
                     symbol.push("T'");
                     symbol.push("F");
-//                    print_symbol_input();
+#ifdef DEBUG
+                    print_symbol_input();
+#endif
                     if_end = true;
                 }
                 if (input.front() == ")" || input.front() == "#" || input.front() == "+") {
@@ -174,21 +183,27 @@ public:
                     if (symbol.size() > 1 && input.size() > 1 && symbol.top() == input.front()) {
                         symbol.pop(), input.pop();
                     }
-//                    print_symbol_input();
+#ifdef DEBUG
+                    print_symbol_input();
+#endif
                     if_end = true;
                 }
             }
             if (symbol.top() == "F") {
                 if (input.front() == "i") {
                     pop_together();
-//                    print_symbol_input();
+#ifdef DEBUG
+                    print_symbol_input();
+#endif
                     if_end = true;
                 }
                 if (input.front() == "(") {
                     pop_together();
                     symbol.push(")");
                     symbol.push("E");
-//                    print_symbol_input();
+#ifdef DEBUG
+                    print_symbol_input();
+#endif
                     if_end = true;
                 }
             }

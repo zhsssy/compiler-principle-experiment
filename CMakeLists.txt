@@ -7,6 +7,13 @@ include_directories(include)
 
 aux_source_directory(src DIR_SRC)
 
+# set debug mode ,output info
+SET(CMAKE_BUILD_TYPE DEBUG)
+
+IF (CMAKE_BUILD_TYPE STREQUAL DEBUG)
+    ADD_DEFINITIONS(-DDEBUG)
+ENDIF ()
+
 #add_executable(compiler_principle_experiment ${DIR_SRC} src/ll1_programmer.cpp include/ll1_programmer.h)
 
 # test lexical_analysis
