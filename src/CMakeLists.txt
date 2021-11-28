@@ -2,3 +2,7 @@
 add_subdirectory(lexical_analysis)
 
 add_subdirectory(ll1_grammar)
+
+add_subdirectory(operator_grammar)
+
+add_subdirectory(structure_ll1)
