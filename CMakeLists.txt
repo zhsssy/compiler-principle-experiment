@@ -5,9 +5,14 @@ set(CMAKE_CXX_STANDARD 20)
 
 include_directories(include)
 
-add_subdirectory(src)
+aux_source_directory(src DIR_SRC)
 
-#aux_source_directory(src DIR_SRC)
+# set debug mode ,output info
+SET(CMAKE_BUILD_TYPE DEBUG)
+
+IF (CMAKE_BUILD_TYPE STREQUAL DEBUG)
+    ADD_DEFINITIONS(-DDEBUG)
+ENDIF ()
 
 #add_executable(compiler_principle_experiment ${DIR_SRC} src/ll1_programmer.cpp include/ll1_programmer.h)
 
@@ -17,5 +22,5 @@ add_subdirectory(src)
 # test ll1_programmer
 #add_executable(compiler_principle_experiment src/ll1_programmer.cpp)
 
-# test grammar grammer_utils
-#add_executable(compiler_principle_experiment src/grammar.cpp)
+# test operator_programmer
+add_executable(compiler_principle_experiment src/operator_programmer.cpp)
