@@ -32,7 +32,7 @@ public:
             cout << "Can't open file." << endl;
             exit(EXIT_FAILURE);
         }
-        while (l.next()) {
+        while (l.scan()) {
             if (l.get_token() == ";") {
                 // 到句末后开始判断 当前是否为符合文法的句子
                 input.push("#");
@@ -171,9 +171,8 @@ public:
                 }
                 if (input.front() == ")" || input.front() == "#" || input.front() == "+") {
                     symbol.pop();
-                    if (symbol.size() > 1 && input.size() > 1 && symbol.top() == input.front()) {
+                    if (symbol.size() > 1 && input.size() > 1 && symbol.top() == input.front())
                         symbol.pop(), input.pop();
-                    }
 //                    print_symbol_input();
                     if_end = true;
                 }

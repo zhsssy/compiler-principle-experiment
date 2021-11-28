@@ -12,14 +12,19 @@ int main(int argc, char *argv[]) {
     string token, s;
     LEXICAL_RESULT result;
 
-    LexicalAnalysis l("../resource/output.txt");
+    if (argc < 2) {
+        cout << "open file error: check path or filename" << endl;
+        exit(EXIT_FAILURE);
+    }
+
+    LexicalAnalysis l(argv[1]);
 
     if (!l.is_open()) {
         cout << "Can't open file." << endl;
         exit(EXIT_FAILURE);
     }
 
-    while (l.next()) {
+    while (l.scan()) {
         result = l.get_result();
         switch (result) {
             case IDENTIFICATION:

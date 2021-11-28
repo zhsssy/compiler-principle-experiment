@@ -38,7 +38,7 @@ public:
             : fin(filename, ios_base::in), p(nullptr), result(ERROR) {
     }
 
-    bool next() {
+    bool scan() {
         skip_blank();
 
         if (p == nullptr || *p == 0) {
