@@ -32,7 +32,7 @@ public:
             cout << "Can't open file." << endl;
             exit(EXIT_FAILURE);
         }
-        while (l.next()) {
+        while (l.scan()) {
             if (l.get_token() == ";") {
                 // 到句末后开始判断 当前是否为符合文法的句子
                 input.push("#");
