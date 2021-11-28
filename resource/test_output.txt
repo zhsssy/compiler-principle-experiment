@@ -1,0 +1,3 @@
+A->@|abcA;
+B->A|abA;
+S->abcA|bcA|cB;
