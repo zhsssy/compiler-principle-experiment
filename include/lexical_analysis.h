@@ -103,6 +103,17 @@ public:
         return fin.is_open();
     }
 
+    static inline bool is_input(LEXICAL_RESULT r) {
+        return r == LEXICAL_RESULT::HEX
+               || r == LEXICAL_RESULT::OCT
+               || r == LEXICAL_RESULT::DIGIT
+               || r == LEXICAL_RESULT::IDENTIFICATION;
+    }
+
+    static inline bool is_key(LEXICAL_RESULT r) {
+        return r == LEXICAL_RESULT::KEY;
+    }
+
 private:
     void skip_blank() {
         if (p != nullptr)

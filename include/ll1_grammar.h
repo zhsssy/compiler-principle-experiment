@@ -27,7 +27,7 @@ public:
 
     // 调取词法分析器
     void analysis() {
-        LexicalAnalysis l("../resource/expression.txt");
+        LexicalAnalysis l("../../../resource/expression.txt");
         if (!l.is_open()) {
             cout << "Can't open file." << endl;
             exit(EXIT_FAILURE);
