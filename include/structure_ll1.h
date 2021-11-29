@@ -269,6 +269,8 @@ void grammar::extract_one_left_divisor(const VN_TYPE elem) {
 
                 s += ch;
                 s += other;
+
+                // s add new grammar this vn_type
                 this_production.insert(s);
                 this_production.erase(save_find->second);
             } else other = map_iter->second;
