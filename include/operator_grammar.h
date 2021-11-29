@@ -17,6 +17,8 @@ class OperatorProgrammer {
 private:
     string result;
     map<string, vector<string>> operator_table;
+    ifstream fin;
+
 
 public:
     OperatorProgrammer() = default;
@@ -52,7 +54,7 @@ public:
     void init() {
         LexicalAnalysis l("../resource/expression.txt");
 
-        while (l.next()) {
+        while (l.scan()) {
             cout << l.get_result() << endl;
             cout << l.get_token() << endl;
         }

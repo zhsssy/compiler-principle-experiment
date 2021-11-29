@@ -200,6 +200,7 @@ void grammar::eliminate_indirect_recursion(const VN_TYPE i, const VN_TYPE j) {
     set<string>::const_iterator i_iter;
     set<string>::const_iterator j_iter;
 
+    // 合并带入
     for (i_iter = i_set.cbegin(); i_iter != i_set.cend();) {
         if (i_iter->at(0) == j) {
             for (j_iter = j_set.cbegin(); j_iter != j_set.cend(); ++j_iter) {
