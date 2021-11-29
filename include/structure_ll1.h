@@ -19,6 +19,13 @@ typedef map<VN_TYPE, set<string>> Production;
 typedef Production::iterator ProIterator;
 typedef pair<VN_TYPE, set<string>> ProPair;
 
+// 注释
+typedef map<VN_TYPE, set<char>> First;
+typedef map<VN_TYPE, set<char>> Follow;
+typedef map<VN_TYPE, map<VT_TYPE, string>> AnalysisTable;
+
+// lexical -> structure ll1 -> ll1 analysis table construct -> ll1 analysis
+
 class grammar {
 private:
     set<VT_TYPE> vt;
@@ -40,7 +47,7 @@ public:
 
     inline void remove_vn(const VN_TYPE elem);
 
-    void add_production(const VT_TYPE begin, const std::string &end);
+    void add_production(const VT_TYPE begin, const string &end);
 
     inline const VN_TYPE get_start() const;
 
@@ -82,6 +89,10 @@ private:
     const VN_TYPE get_unuse_vn() const;
 };
 
+grammar::grammar() : vn(), vt(), production() {}
+
+grammar::~grammar() {}
+
 void grammar::set_start(const VN_TYPE s) {
     start = s;
 }
@@ -99,11 +110,11 @@ const VN_TYPE grammar::get_start() const { return start; }
 
 set<VT_TYPE> &grammar::get_vt() { return vt; }
 
-const std::set<VT_TYPE> &grammar::get_vt() const { return vt; }
+const set<VT_TYPE> &grammar::get_vt() const { return vt; }
 
-std::set<VN_TYPE> &grammar::get_vn() { return vn; }
+set<VN_TYPE> &grammar::get_vn() { return vn; }
 
-const std::set<VN_TYPE> &grammar::get_vn() const { return vn; }
+const set<VN_TYPE> &grammar::get_vn() const { return vn; }
 
 Production &grammar::get_production() { return production; }
 
@@ -113,10 +124,6 @@ bool grammar::is_vt(char ch) const { return vt.contains(ch); }
 
 bool grammar::is_vn(char ch) const { return vn.contains(ch); }
 
-
-grammar::grammar() : vn(), vt(), production() {}
-
-grammar::~grammar() {}
 
 void grammar::add_production(const VN_TYPE begin, const string &end) {
     auto iter = production.find(begin);
@@ -136,7 +143,7 @@ void grammar::construct_LL1() {
     this->extract_left_divisor();
 }
 
-const VN_TYPE grammar::fuzzy_reduced(const std::string &str) const {
+const VN_TYPE grammar::fuzzy_reduced(const string &str) const {
     size_t index;
     for (const VN_TYPE one: vn)
         for (auto pro: production.find(one)->second)
