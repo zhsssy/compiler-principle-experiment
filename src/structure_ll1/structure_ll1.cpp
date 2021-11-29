@@ -36,7 +36,7 @@ int main(int argc, char *argv[]) {
         tmp += pair.first;
         tmp += "->";
 
-        for (string s: pair.second) {
+        for (const auto &s: pair.second) {
             tmp += s + "|";
         }
         tmp.back() = ';';

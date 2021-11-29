@@ -56,7 +56,7 @@ public:
 
     inline const Production &get_production() const;
 
-    inline bool is_vt(char ch) const;
+    [[nodiscard]] inline bool is_vt(char ch) const;
 
     inline bool is_vn(char ch) const;
 
@@ -109,9 +109,9 @@ Production &grammar::get_production() { return production; }
 
 const Production &grammar::get_production() const { return production; }
 
-bool grammar::is_vt(char ch) const { return vt.find(ch) != vt.cend(); }
+bool grammar::is_vt(char ch) const { return vt.contains(ch); }
 
-bool grammar::is_vn(char ch) const { return vn.find(ch) != vn.cend(); }
+bool grammar::is_vn(char ch) const { return vn.contains(ch); }
 
 
 grammar::grammar() : vn(), vt(), production() {}
@@ -119,12 +119,13 @@ grammar::grammar() : vn(), vt(), production() {}
 grammar::~grammar() {}
 
 void grammar::add_production(const VN_TYPE begin, const string &end) {
-    ProIterator iter = production.find(begin);
+    auto iter = production.find(begin);
 
+    // 找到现有的 不然就直接加入一个新的 production
     if (iter != production.end()) {
         iter->second.insert(end);
     } else {
-        set<string> *ends = new set<string>();
+        auto *ends = new set<string>();
         ends->insert(end);
         production.insert(*(new ProPair(begin, *ends)));
     }
