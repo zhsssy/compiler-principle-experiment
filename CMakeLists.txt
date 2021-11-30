@@ -10,7 +10,7 @@ include_directories(include)
 add_subdirectory(src)
 
 # set debug mode ,output info
-SET(CMAKE_BUILD_TYPE DEBUG)
+#SET(CMAKE_BUILD_TYPE DEBUG)
 
 IF (CMAKE_BUILD_TYPE STREQUAL DEBUG)
     ADD_DEFINITIONS(-DDEBUG)

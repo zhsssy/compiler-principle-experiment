@@ -16,34 +16,34 @@ int main(int argc, char **argv) {
     l.make_first();
     l.make_follow();
     l.make_table();
-#define DEBUG
+//#define DEBUG
 #ifdef DEBUG
-    cout << endl;
-    for (const auto &i: l.get_first()) {
-        cout << i.first << " ";
-        for (auto j: i.second) {
-            cout << j << " ";
-        }
-        cout << endl;
-    }
-    for (const auto &i: l.get_follow()) {
-        cout << i.first << " ";
-        for (auto j: i.second) {
-            cout << j << " ";
-        }
-        cout << endl;
-    }
-    for (auto i: l.get_analysis_table()) {
-        cout << i.first << "=";
-        for (const auto &j: i.second) {
-            cout << j.first << " {";
-            for (auto k: j.second) {
-                cout << k;
-            }
-            cout << "}";
-        }
-        cout << endl;
-    }
+    //    cout << endl;
+    //    for (const auto &i: l.get_first()) {
+    //        cout << i.first << " ";
+    //        for (auto j: i.second) {
+    //            cout << j << " ";
+    //        }
+    //        cout << endl;
+    //    }
+    //    for (const auto &i: l.get_follow()) {
+    //        cout << i.first << " ";
+    //        for (auto j: i.second) {
+    //            cout << j << " ";
+    //        }
+    //        cout << endl;
+    //    }
+    //    for (auto i: l.get_analysis_table()) {
+    //        cout << i.first << "=";
+    //        for (const auto &j: i.second) {
+    //            cout << j.first << " {";
+    //            for (auto k: j.second) {
+    //                cout << k;
+    //            }
+    //            cout << "}";
+    //        }
+    //        cout << endl;
+    //    }
 #endif
     l.analysis();
 

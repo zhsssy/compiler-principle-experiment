@@ -32,6 +32,8 @@ typedef multimap<VN_TYPE, map<VT_TYPE, string>> AnalysisTable;
 
 class LL1Analysis {
 private:
+    stack<VN_TYPE> symbol;
+    queue<VT_TYPE> input;
     bool if_end;
     bool answer;
     grammar g;
@@ -43,7 +45,7 @@ public:
     LL1Analysis() : if_end(false), answer(false) {
         g = create_grammar_by_file("../../../resource/utils.txt");
         g.construct_LL1();
-#define DEBUG
+//#define DEBUG
 #ifdef DEBUG
         for (ProPair pair: g.get_production()) {
             string tmp;
@@ -317,61 +319,56 @@ public:
 
     // 调取词法分析器
     void analysis() {
-//        LexicalAnalysis l("../../../resource/expression.txt");
-//
-//        if (!l.is_open()) {
-//            cout << "Can't open file." << endl;
-//            exit(EXIT_FAILURE);
-//        }
-//        while (l.scan()) {
-//            if (l.get_token() == ";") {
-//                // 到句末后开始判断 当前是否为符合文法的句子
-//                input.push("#");
-//#ifdef DEBUG
-//                queue<string> temp = input;
-//                cout << "start to print input" << endl;
-//                while (!temp.empty()) {
-//                    // debug： 排除 # 和 ; 不打印
-//                    if (temp.front() == "#" && temp.front() == ";") {
-//                        break;
-//                    }
-//                    cout << temp.front();
-//                    temp.pop();
-//                }
-//                cout << endl << endl;
-//#endif
-//                cout << answer << endl;
-//                init();
-//            }
-//
-//            // 保存临时结果  判断推入 input 栈中的词法类型
-//            LEXICAL_RESULT la_temp = l.get_result();
-//            // 将标识符和数字转换为 i ，便于分析
-//            if (LexicalAnalysis::is_input(la_temp))
-//                input.push("i");
-//
-//            if (LexicalAnalysis::is_key(la_temp) && l.get_token() != ";")
-//                input.push(l.get_token());
-//        }
+        LexicalAnalysis l("../../../resource/expression.txt");
 
-        stack<VN_TYPE> symbol;
-        queue<VT_TYPE> input;
-        input.push('i');
-        input.push('*');
-        input.push('i');
-        input.push('+');
-        input.push('i');
-        input.push('#');
-        symbol.push('#');
-        symbol.push(g.get_start());
-        bool judge_if_find = false;
+        if (!l.is_open()) {
+            cout << "Can't open file." << endl;
+            exit(EXIT_FAILURE);
+        }
+        init();
+        while (l.scan()) {
+            if (l.get_token() == ";") {
+                // 到句末后开始判断 当前是否为符合文法的句子
+                input.push('#');
+//#define DEBUG
+#ifdef DEBUG
+                cout << "input str: ";
+                queue<char> temp = input;
+                while (!temp.empty()) {
+                    // debug： 排除 # 和 ; 不打印
+                    if (temp.front() == '#')
+                        break;
+                    cout << temp.front();
+                    temp.pop();
+                }
+#endif
+                analysis_single();
+                cout << endl << (answer ? "success" : "failed") << endl << endl;
+                init();
+            }
+
+            // 保存临时结果  判断推入 input 栈中的词法类型
+            LEXICAL_RESULT la_temp = l.get_result();
+            // 将标识符和数字转换为 i ，便于分析
+            if (LexicalAnalysis::is_input(la_temp))
+                input.push('i');
+
+            if (LexicalAnalysis::is_key(la_temp) && l.get_token() != ";")
+                input.push(l.get_token().c_str()[0]);
+        }
+    }
+
+
+    void analysis_single() {
+        bool judge_if_find;
+        bool if_end;
         while (!input.empty()) {
             if (analysis_table.contains(symbol.top())) {
-#define debug
-#ifdef debug
+//#define DEBUG
+#ifdef DEBUG
                 print_symbol_input(symbol, input);
-                cout << endl;
 #endif
+                if_end = false;
                 judge_if_find = false;
                 auto temp_it = analysis_table.equal_range(symbol.top());
                 auto st = temp_it.first, en = temp_it.second;
@@ -383,32 +380,41 @@ public:
                     }
 
                 if (!judge_if_find) {
-                    cout << "failed" << endl;
                     exit(EXIT_FAILURE);
                 }
 
+                // 反转插入 symbol 栈
+                reverse(str.begin(), str.end());
                 auto temp = str;
-                if (temp.size() == 1 && temp[0] == '@')
+                if (temp[0] == '@') {
                     symbol.pop();
-                else if (temp.size() > 1) {
+                    if_end = true;
+                } else if (temp.size() >= 1) {
                     symbol.pop();
                     for (auto s: temp) {
                         symbol.push(s);
                     }
+                    if_end = true;
+                }
+                // 如果同时为 # 则证明正确
+                if (symbol.top() == '#' && input.front() == '#') {
+                    this->answer = true;
+                    break;
                 }
 
+                // 相同则推出
                 if (symbol.top() == input.front()) {
-                    cout << "pop: " << symbol.top() << endl;
+#ifdef DEBUG
+                    cout << endl << "pop: " << symbol.top() << endl;
+#endif
                     symbol.pop();
                     input.pop();
+                    if_end = true;
                 }
-
-                if (symbol.top() == '#' && input.front() == '#') {
-                    cout << "success " << endl;
+                if (!if_end) {
                     break;
                 }
             }
-
         }
     }
 
@@ -430,13 +436,13 @@ public:
         }
     }
 
-//    void init() {
-//        queue<std::string>().swap(input);
-//        stack<std::string>().swap(symbol);
-//        symbol.push("#");
-//        symbol.push("E");
-//        this->answer = false;
-//    }
+    void init() {
+        queue<char>().swap(input);
+        stack<char>().swap(symbol);
+        symbol.push('#');
+        symbol.push(g.get_start());
+        this->answer = false;
+    }
 
 };
 
