@@ -14,6 +14,7 @@
 
 using namespace std;
 
+// 手工分析版本 弃用
 class LL1Programmer {
 private :
     stack<string> symbol;

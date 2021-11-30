@@ -1,6 +1,7 @@
 //
 // Created by zhsssy.
 //
+// grammar_utils.h: 用于文法构造辅助函数的存放
 
 #ifndef COMPILER_PRINCIPLE_EXPERIMENT_GRAMMAR_UTILS_H
 #define COMPILER_PRINCIPLE_EXPERIMENT_GRAMMAR_UTILS_H
@@ -10,23 +11,28 @@
 #include <string>
 #include <iostream>
 
+using std::string;
+using std::ifstream;
+using std::ofstream;
+using std::cerr;
+using std::endl;
 
 grammar create_grammar_by_file(char *filename);
 
-void deal_with_left(grammar &g, const std::string &right, bool &first);
+void deal_with_left(grammar &g, const string &left, bool &first);
 
-void deal_with_right(grammar &g, VN_TYPE vn, const std::string &right);
+void deal_with_right(grammar &g, VN_TYPE vn, const string &right);
 
-void write_grammar_in_file(grammar g, char *filename);
+void write_grammar_in_file(const grammar &g, char *filename);
 
 grammar create_grammar_by_file(char *filename) {
     grammar g;
-    std::ifstream fin = std::ifstream(filename, std::ios_base::in);
-    std::string s;
+    ifstream fin(filename);
+    string s;
     bool first = true;
 
     if (!fin.is_open()) {
-        std::cerr << "Can't open " << filename << std::endl;
+        cerr << "Can't open " << filename << endl;
         exit(EXIT_FAILURE);
     }
 
@@ -35,13 +41,13 @@ grammar create_grammar_by_file(char *filename) {
 
         // 没有 ‘->’ 退出
         if (index == std::string::npos) {
-            std::cerr << "ERROR::" << s << "::NOT\"->\"." << std::endl;
+            cerr << "ERROR::" << s << "::NOT\"->\"." << endl;
             continue;
         }
 
         // 没有 ‘;’ 退出
         if (*(--s.cend()) != ';') {
-            std::cerr << "ERROR::" << s << "::NOT \";\"." << std::endl;
+            cerr << "ERROR::" << s << "::NOT \";\"." << endl;
         }
 
         // 删除 ‘;’
@@ -74,7 +80,7 @@ void deal_with_right(grammar &g, const VN_TYPE vn, const std::string &right) {
     for (i = right.cbegin(), j = right.cbegin(); i != right.cend();) {
         // 分别加入
         if (*i == '|') {
-            g.add_production(vn, std::string(j, i));
+            g.add_production(vn, string(j, i));
             j = ++i;
         } else {
             if (isupper(*i))
@@ -89,11 +95,11 @@ void deal_with_right(grammar &g, const VN_TYPE vn, const std::string &right) {
         g.add_production(vn, std::string(j, i));
 }
 
-void write_grammar_in_file(const grammar g, char *filename) {
-    std::ofstream fout(filename);
+void write_grammar_in_file(const grammar &g, char *filename) {
+    ofstream f_out(filename);
 
-    if (!fout.is_open()) {
-        std::cerr << "Can't open " << filename << std::endl;
+    if (!f_out.is_open()) {
+        cerr << "Can't open " << filename << endl;
         exit(EXIT_FAILURE);
     }
 
@@ -106,7 +112,7 @@ void write_grammar_in_file(const grammar g, char *filename) {
             tmp += s + "|";
         }
         tmp.back() = ';';
-        fout << tmp << endl;
+        f_out << tmp << endl;
     }
 }
 

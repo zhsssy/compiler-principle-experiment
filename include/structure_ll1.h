@@ -16,7 +16,6 @@ using namespace std;
 typedef char VT_TYPE;
 typedef char VN_TYPE;
 typedef map<VN_TYPE, set<string>> Production;
-typedef Production::iterator ProIterator;
 typedef pair<VN_TYPE, set<string>> ProPair;
 
 // lexical -> structure ll1 -> ll1 analysis table construct -> ll1 analysis
