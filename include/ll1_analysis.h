@@ -1,6 +1,6 @@
 
 //
-// Created by zhsssy on 2021/11/29.
+// Created by zhsssy
 //
 
 #ifndef COMPILER_PRINCIPLE_EXPERIMENT_LL1_ANALYSIS_H
@@ -103,9 +103,9 @@ public:
         }
 
 
-        //循环结束条件： 直到每一个FIRST(X)不再增大为止
         //3.对X→Y0Y1…….Yk(且Y0 ∈Vn), 反复使用以下直到每一个FIRST(X)不再增大为止
-        // 临时存储 vn 个 first 集
+        // 开辟大小为 vn.size() 的空间 临时存储 vn 个 first 集
+        // 循环求解直到不再增大
         set<char> temp[g.get_vn().size()];
         size_t k = 0, first_size = 0;
         for (auto it = g.get_production().begin();; it++, k++) {

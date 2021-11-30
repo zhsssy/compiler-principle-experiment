@@ -1,5 +1,5 @@
 //
-// Created by zhsssy on 2021.11.15.
+// Created by zhsssy.
 //
 
 #include <ll1_grammar.h>

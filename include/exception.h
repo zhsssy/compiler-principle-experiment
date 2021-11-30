@@ -1,5 +1,5 @@
 //
-// Created by zhsssy on 2021.11.28.
+// Created by zhsssy
 //
 
 #ifndef COMPILER_PRINCIPLE_EXPERIMENT_EXCEPTION_H
@@ -10,13 +10,9 @@
 class ReduceException : std::exception {
 private:
 public:
-    ReduceException(/* args */) {
+    ReduceException() = default;
 
-    }
-
-    ~ReduceException() {
-
-    }
+    ~ReduceException() override = default;
 };
 
 #endif //COMPILER_PRINCIPLE_EXPERIMENT_EXCEPTION_H

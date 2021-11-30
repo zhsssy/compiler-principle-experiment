@@ -1,5 +1,5 @@
 //
-// Created by zhsssy on 2021/11/26.
+// Created by zhsssy.
 //
 
 #ifndef COMPILER_PRINCIPLE_EXPERIMENT_OPERATOR_PROGRAMMER_H
