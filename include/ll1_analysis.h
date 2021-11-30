@@ -42,24 +42,20 @@ private:
     AnalysisTable analysis_table;
 
 public:
-    LL1Analysis() : if_end(false), answer(false) {
-        g = create_grammar_by_file("../../../resource/utils.txt");
+    explicit LL1Analysis(char *filename) : if_end(false), answer(false) {
+        g = create_grammar_by_file(filename);
         g.construct_LL1();
 //#define DEBUG
 #ifdef DEBUG
-        for (ProPair pair: g.get_production()) {
-            string tmp;
-            tmp += pair.first;
-            tmp += "->";
-
-            for (const auto &s: pair.second) {
-                tmp += s + "|";
-            }
-            tmp.back() = ';';
-            cout << tmp << endl;
-        }
+        g.print_production();
 #endif
     };
+
+    void print_first();
+
+    void print_follow();
+
+    void print_table();
 
     ~LL1Analysis() = default;
 
@@ -330,7 +326,6 @@ public:
             if (l.get_token() == ";") {
                 // 到句末后开始判断 当前是否为符合文法的句子
                 input.push('#');
-//#define DEBUG
 #ifdef DEBUG
                 cout << "input str: ";
                 queue<char> temp = input;
@@ -361,10 +356,8 @@ public:
 
     void analysis_single() {
         bool judge_if_find;
-        bool if_end;
         while (!input.empty()) {
             if (analysis_table.contains(symbol.top())) {
-//#define DEBUG
 #ifdef DEBUG
                 print_symbol_input(symbol, input);
 #endif
@@ -380,7 +373,7 @@ public:
                     }
 
                 if (!judge_if_find) {
-                    exit(EXIT_FAILURE);
+                    break;
                 }
 
                 // 反转插入 symbol 栈
@@ -389,11 +382,10 @@ public:
                 if (temp[0] == '@') {
                     symbol.pop();
                     if_end = true;
-                } else if (temp.size() >= 1) {
+                } else if (!temp.empty()) {
                     symbol.pop();
-                    for (auto s: temp) {
+                    for (auto s: temp)
                         symbol.push(s);
-                    }
                     if_end = true;
                 }
                 // 如果同时为 # 则证明正确
@@ -401,7 +393,9 @@ public:
                     this->answer = true;
                     break;
                 }
-
+                if (!isupper(symbol.top()) && input.front() != symbol.top()) {
+                    break;
+                }
                 // 相同则推出
                 if (symbol.top() == input.front()) {
 #ifdef DEBUG
@@ -411,9 +405,9 @@ public:
                     input.pop();
                     if_end = true;
                 }
-                if (!if_end) {
+                if (!if_end)
                     break;
-                }
+
             }
         }
     }
@@ -445,5 +439,41 @@ public:
     }
 
 };
+
+void LL1Analysis::print_first() {
+    for (const auto &i: first) {
+        printf("FIRST(%c)=", i.first);
+        cout << "{";
+        for (auto j: i.second) {
+            cout << j << " ";
+        }
+        cout << "}" << endl;
+    }
+}
+
+void LL1Analysis::print_follow() {
+    for (const auto &i: follow) {
+        printf("FOLLOW(%c)=", i.first);
+        cout << "{";
+        for (auto j: i.second) {
+            cout << j << " ";
+        }
+        cout << "}" << endl;
+    }
+}
+
+void LL1Analysis::print_table() {
+    for (auto i: analysis_table) {
+        cout << i.first << "=";
+        for (const auto &j: i.second) {
+            cout << j.first << " {";
+            for (auto k: j.second) {
+                cout << k;
+            }
+            cout << "}";
+        }
+        cout << endl;
+    }
+}
 
 #endif //COMPILER_PRINCIPLE_EXPERIMENT_LL1_ANALYSIS_H

@@ -66,6 +66,8 @@ public:
 
     const VT_TYPE fuzzy_reduced(const string &str) const;
 
+    void print_production();
+
 private:
     void eliminate_left_recursion();
 
@@ -91,6 +93,21 @@ grammar::~grammar() {}
 void grammar::set_start(const VN_TYPE s) {
     start = s;
 }
+
+
+void grammar::print_production() {
+    for (ProPair pair: production) {
+        string tmp;
+        tmp += pair.first;
+        tmp += "->";
+
+        for (const auto &s: pair.second) {
+            tmp += s + "|";
+        }
+        tmp.back() = ';';
+        cout << tmp << endl;
+    }
+};
 
 void grammar::add_vt(const VT_TYPE elem) { vt.insert(elem); }
 
