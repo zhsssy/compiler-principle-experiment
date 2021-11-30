@@ -32,8 +32,6 @@ typedef multimap<VN_TYPE, map<VT_TYPE, string>> AnalysisTable;
 
 class LL1Analysis {
 private:
-    stack<string> symbol;
-    queue<string> input;
     bool if_end;
     bool answer;
     grammar g;
@@ -319,51 +317,126 @@ public:
 
     // 调取词法分析器
     void analysis() {
-        LexicalAnalysis l("../../../resource/expression.txt");
+//        LexicalAnalysis l("../../../resource/expression.txt");
+//
+//        if (!l.is_open()) {
+//            cout << "Can't open file." << endl;
+//            exit(EXIT_FAILURE);
+//        }
+//        while (l.scan()) {
+//            if (l.get_token() == ";") {
+//                // 到句末后开始判断 当前是否为符合文法的句子
+//                input.push("#");
+//#ifdef DEBUG
+//                queue<string> temp = input;
+//                cout << "start to print input" << endl;
+//                while (!temp.empty()) {
+//                    // debug： 排除 # 和 ; 不打印
+//                    if (temp.front() == "#" && temp.front() == ";") {
+//                        break;
+//                    }
+//                    cout << temp.front();
+//                    temp.pop();
+//                }
+//                cout << endl << endl;
+//#endif
+//                cout << answer << endl;
+//                init();
+//            }
+//
+//            // 保存临时结果  判断推入 input 栈中的词法类型
+//            LEXICAL_RESULT la_temp = l.get_result();
+//            // 将标识符和数字转换为 i ，便于分析
+//            if (LexicalAnalysis::is_input(la_temp))
+//                input.push("i");
+//
+//            if (LexicalAnalysis::is_key(la_temp) && l.get_token() != ";")
+//                input.push(l.get_token());
+//        }
 
-        if (!l.is_open()) {
-            cout << "Can't open file." << endl;
-            exit(EXIT_FAILURE);
-        }
-        while (l.scan()) {
-            if (l.get_token() == ";") {
-                // 到句末后开始判断 当前是否为符合文法的句子
-                input.push("#");
-#ifdef DEBUG
-                queue<string> temp = input;
-                cout << "start to print input" << endl;
-                while (!temp.empty()) {
-                    // debug： 排除 # 和 ; 不打印
-                    if (temp.front() == "#" && temp.front() == ";") {
-                        break;
-                    }
-                    cout << temp.front();
-                    temp.pop();
-                }
-                cout << endl << endl;
+        stack<VN_TYPE> symbol;
+        queue<VT_TYPE> input;
+        input.push('i');
+        input.push('*');
+        input.push('i');
+        input.push('+');
+        input.push('i');
+        input.push('#');
+        symbol.push('#');
+        symbol.push(g.get_start());
+        bool judge_if_find = false;
+        while (!input.empty()) {
+            if (analysis_table.contains(symbol.top())) {
+#define debug
+#ifdef debug
+                print_symbol_input(symbol, input);
+                cout << endl;
 #endif
-                cout << answer << endl;
-                init();
+                judge_if_find = false;
+                auto temp_it = analysis_table.equal_range(symbol.top());
+                auto st = temp_it.first, en = temp_it.second;
+                string str;
+                for (auto it = st; it != en; ++it)
+                    if (it->second.contains(input.front())) {
+                        judge_if_find = true;
+                        str = it->second[input.front()];
+                    }
+
+                if (!judge_if_find) {
+                    cout << "failed" << endl;
+                    exit(EXIT_FAILURE);
+                }
+
+                auto temp = str;
+                if (temp.size() == 1 && temp[0] == '@')
+                    symbol.pop();
+                else if (temp.size() > 1) {
+                    symbol.pop();
+                    for (auto s: temp) {
+                        symbol.push(s);
+                    }
+                }
+
+                if (symbol.top() == input.front()) {
+                    cout << "pop: " << symbol.top() << endl;
+                    symbol.pop();
+                    input.pop();
+                }
+
+                if (symbol.top() == '#' && input.front() == '#') {
+                    cout << "success " << endl;
+                    break;
+                }
             }
 
-            // 保存临时结果  判断推入 input 栈中的词法类型
-            LEXICAL_RESULT la_temp = l.get_result();
-            // 将标识符和数字转换为 i ，便于分析
-            if (LexicalAnalysis::is_input(la_temp))
-                input.push("i");
-
-            if (LexicalAnalysis::is_key(la_temp) && l.get_token() != ";")
-                input.push(l.get_token());
         }
     }
 
-    void init() {
-        queue<std::string>().swap(input);
-        stack<std::string>().swap(symbol);
-        symbol.push("#");
-        symbol.push("E");
-        this->answer = false;
+    void print_symbol_input(stack<char> &a, queue<char> &b) {
+        stack<char> temp_symbol = a;
+        queue<char> temp_input = b;
+        string temp_str;
+        cout << endl << "symbol: ";
+        while (!temp_symbol.empty()) {
+            temp_str += temp_symbol.top();
+            temp_symbol.pop();
+        }
+        reverse(temp_str.begin(), temp_str.end());
+        cout << temp_str;
+        cout << endl << "input: ";
+        while (!temp_input.empty()) {
+            cout << temp_input.front();
+            temp_input.pop();
+        }
     }
+
+//    void init() {
+//        queue<std::string>().swap(input);
+//        stack<std::string>().swap(symbol);
+//        symbol.push("#");
+//        symbol.push("E");
+//        this->answer = false;
+//    }
 
 };
 

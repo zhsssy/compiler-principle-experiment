@@ -45,5 +45,6 @@ int main(int argc, char **argv) {
         cout << endl;
     }
 #endif
+    l.analysis();
 
 }
