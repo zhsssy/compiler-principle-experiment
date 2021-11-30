@@ -1,3 +1,4 @@
+
 //
 // Created by zhsssy on 2021/11/29.
 //
@@ -27,7 +28,7 @@ using std::queue;
 
 typedef map<VN_TYPE, set<char>> First;
 typedef map<VN_TYPE, set<char>> Follow;
-typedef map<VN_TYPE, map<VT_TYPE, string>> AnalysisTable;
+typedef multimap<VN_TYPE, map<VT_TYPE, string>> AnalysisTable;
 
 class LL1Analysis {
 private:
@@ -42,8 +43,22 @@ private:
 
 public:
     LL1Analysis() : if_end(false), answer(false) {
-        g = create_grammar_by_file("../../../resource/test_utils.txt");
+        g = create_grammar_by_file("../../../resource/utils.txt");
         g.construct_LL1();
+#define DEBUG
+#ifdef DEBUG
+        for (ProPair pair: g.get_production()) {
+            string tmp;
+            tmp += pair.first;
+            tmp += "->";
+
+            for (const auto &s: pair.second) {
+                tmp += s + "|";
+            }
+            tmp.back() = ';';
+            cout << tmp << endl;
+        }
+#endif
     };
 
     ~LL1Analysis() = default;
@@ -265,73 +280,41 @@ public:
         }
     }
 
+//    1. for  ∀ a ∈ FIRST(α)， 将 A -> α 填入 M [A, a ];
+//    2. if（ε ∈ FIRST(α)） ∀ a ∈ FOLLOW (A) ， 将 A -> ε 填入 M [A, a ]; PS: 这里的 a 包括 #
     void make_table() {
         string action;
-        //纵轴遍历Vn
-        for (auto it1: g.get_vn()) {
-            //横轴遍历Vt
-            for (auto it2: g.get_vt()) {
-                action = "";
-                //如果it2是it1的first集元素:it2∈first(it1)
-                if (first[it1].contains(it2)) {
-                    //本应有一步动作：查询it2是it1哪一个规则的first集元素
-                    VN_TYPE it_vn = it1;
-                    VT_TYPE it_vt = it2;
-                    set<string> principle;
-                    principle = g.get_production()[it_vn];
-
-                    //剔除空产生式
-                    int T = 0;
-                    for (auto it = principle.begin(); T < principle.size(); it++, T++) {
-                        if (*it == " ")
-                            principle.erase(it);
+        for (auto it_vn: g.get_vn()) {
+            // 获取当前 vn 的文法规则
+            set<string> principle = g.get_production()[it_vn];
+            // 查找 a 的文法集
+            for (auto p_it: principle) {
+                // 如果是 a的首字母是 vn ，则找出 FIRST(α) 之后逐个加入
+                if (isupper(p_it[0])) {
+                    // 找到 FIRST(α)
+                    auto temp_first = first[p_it[0]];
+                    for (auto a: temp_first) {
+                        analysis_table.insert({it_vn, {{a, p_it}}});
                     }
-
-                    if (principle.size() > 1) {
-                        for (const auto &prin_it: principle) {
-                            //空动作不管
-                            if (prin_it == " ")
-                                continue;
-                            //产生式的第一个即为vt，则必定为其first集
-                            if (prin_it.find(it_vt) != string::npos) {
-                                action = prin_it;
-                                break;
-                            }
-
+                    // 如果 @ 属于 FIRST(a) 则加入 ∀a ∈ FOLLOW(a) 将A -> ε填入M[A, a ]
+                    if (temp_first.contains('@')) {
+                        auto temp_follow = follow[it_vn];
+                        for (auto a: temp_follow) {
+                            analysis_table.insert({it_vn, {{a, "@"}}});
                         }
-                    } else {
-                        for (auto it: g.get_production())
-                            for (auto it2: it.second)
-                                if (it2[0] == it_vn)
-                                    action = it2;
-                        analysis_table.insert({it_vn, {{it_vt, action}}});
+                    }
+                } else if (p_it[0] == '@') {
+                    auto temp_follow = follow[it_vn];
+                    for (auto a: temp_follow) {
+                        analysis_table.insert({it_vn, {{a, "@"}}});
                     }
                 }
-                    //如果it2是it1的follow集元素:it2∈follow(it1),且若ε ∈ FIRST(it1)
-                else if (first.at(it1).count('@') != 0 && follow.at(it1).count(it2) != 0) {
-                    action = "pop";
-                    analysis_table.insert({it1, {{it2, action}}});
-                }
-                    //对应分析表中的空白，即出错
+                    // α 第一个字母是小写字母 ，直接加入
                 else {
-                    action = "-1";
-                    analysis_table.insert({it1, {{it2, action}}});
+                    analysis_table.insert({it_vn, {{p_it[0], p_it}}});
                 }
-            }//横轴遍历Vt
-
-            //纵轴添加一个‘#’
-
-            //添加条件：Vn->ε 且 ‘#’ ∈ follow(Vn)
-            if (first.at(it1).count('@') != 0 && follow.at(it1).count('#') != 0) {
-                action = "pop";
-                analysis_table.insert({it1, {{'#', action}}});
             }
-                //对应分析表中的空白，即出错
-            else {
-                action = "-1";
-                analysis_table.insert({it1, {{'#', action}}});
-            }
-        }//纵轴遍历Vn
+        }
     }
 
     // 调取词法分析器
@@ -355,7 +338,7 @@ public:
                         break;
                     }
                     cout << temp.front();
-                    temp.pop(); w
+                    temp.pop();
                 }
                 cout << endl << endl;
 #endif

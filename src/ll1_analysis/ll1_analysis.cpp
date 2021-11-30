@@ -18,6 +18,7 @@ int main(int argc, char **argv) {
     l.make_table();
 #define DEBUG
 #ifdef DEBUG
+    cout << endl;
     for (const auto &i: l.get_first()) {
         cout << i.first << " ";
         for (auto j: i.second) {
@@ -33,12 +34,13 @@ int main(int argc, char **argv) {
         cout << endl;
     }
     for (auto i: l.get_analysis_table()) {
-        cout << i.first << " ";
-        for (auto j: i.second) {
-            cout << j.first << " ";
+        cout << i.first << "=";
+        for (const auto &j: i.second) {
+            cout << j.first << " {";
             for (auto k: j.second) {
-                cout << k << " ";
+                cout << k;
             }
+            cout << "}";
         }
         cout << endl;
     }

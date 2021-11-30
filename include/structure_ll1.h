@@ -19,11 +19,6 @@ typedef map<VN_TYPE, set<string>> Production;
 typedef Production::iterator ProIterator;
 typedef pair<VN_TYPE, set<string>> ProPair;
 
-// 注释
-typedef map<VN_TYPE, set<char>> First;
-typedef map<VN_TYPE, set<char>> Follow;
-typedef map<VN_TYPE, map<VT_TYPE, string>> AnalysisTable;
-
 // lexical -> structure ll1 -> ll1 analysis table construct -> ll1 analysis
 
 class grammar {
