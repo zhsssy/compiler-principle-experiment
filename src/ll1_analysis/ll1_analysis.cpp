@@ -16,7 +16,6 @@ int main(int argc, char **argv) {
     l.make_first();
     l.make_follow();
     l.make_table();
-//#define DEBUG
 #ifdef DEBUG
     l.print_first();
     l.print_follow();

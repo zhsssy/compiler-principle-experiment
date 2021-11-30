@@ -23,11 +23,10 @@ int main(int argc, char *argv[]) {
 
     g.construct_LL1();
 
-    cout << "The result:" << endl;
+    cout << "The VN set: ";
 
-    for (VN_TYPE vn: g.get_vn()) {
+    for (VN_TYPE vn: g.get_vn())
         cout << vn << " ";
-    }
 
     cout << endl;
 
