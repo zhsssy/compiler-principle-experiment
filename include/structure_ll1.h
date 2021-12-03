@@ -158,9 +158,11 @@ const VN_TYPE grammar::fuzzy_reduced(const string &str) const {
 #ifdef DEBUG
     cout << "start reduce: " << str << endl;
 #endif
-    cout << "reduce: " << str << endl;
+    // 遍历文法
     for (const VN_TYPE one: vn)
+        // 每个非终结符对应的文法
         for (auto pro: production.find(one)->second)
+            // 如果大小相同开始比较
             if (str.size() == pro.size()) {
                 for (index = 0; index < str.size(); ++index)
                     if (is_vt(pro.at(index)) && str.at(index) != pro.at(index))

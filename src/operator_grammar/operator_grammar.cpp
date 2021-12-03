@@ -14,6 +14,7 @@ int main(int argc, char *argv[]) {
     grammar g = create_grammar_by_file(argv[1]);
     LexicalAnalysis l(argv[2]);
     g.print_production();
+    cout << "VT: ";
     for (auto i: g.get_vt()) {
         cout << i << " ";
     }
@@ -22,7 +23,6 @@ int main(int argc, char *argv[]) {
     unsigned k, j;
     char N;
     string token_str;
-    bool judge = true;
     size_t sym;
     char SYM, Q;
     string str_stack;
@@ -56,7 +56,9 @@ int main(int argc, char *argv[]) {
             SYM = input.at(sym++);
             if (str_stack.at(k) == '#' || g.is_vt(str_stack.at(k))) j = k;
             else j = k - 1;
-//            cout << "str len: " << str_stack.length() << " " << str_stack << endl;
+#ifdef DEBUG
+            cout << "str len: " << str_stack.length() << " " << str_stack << endl;
+#endif
             try {
                 while (priority_judgement(str_stack.at(j), SYM) == 1) {
                     do {
@@ -64,12 +66,15 @@ int main(int argc, char *argv[]) {
                         if (j <= 0) break;
                         if (j > 0 && (str_stack.at(j - 1) == '#' || g.is_vt(str_stack.at(j - 1)))) j = j - 1;
                         else j = j - 2;
-                    } while (priority_judgement(str_stack.at(j), Q) == -1);
+                    } while (priority_judgement(str_stack.at(j), Q) != -1);
                     N = g.fuzzy_reduced(str_stack.substr(j + 1, k));
-                    str_stack.erase(j + 1, k - j - 1);
+                    str_stack = str_stack.erase(j + 1, k - j);
                     k = j + 1;
                     str_stack += N;
-//                    cout << "str2 len: " << str_stack.length() << " " << str_stack << endl;
+#ifdef DEBUG
+                    cout << "str2 len: " << str_stack.length() << " " << str_stack << endl;
+                    cout << "input: " << input.substr(sym, input.size() - sym) << endl;
+#endif
                 }
             }
             catch (ReduceException e) {
@@ -83,14 +88,18 @@ int main(int argc, char *argv[]) {
                     k++;
                     str_stack += SYM;
                 } else {
-                    judge = false;
                     break;
                 }
             } catch (const char *ch) {
                 cout << input << ch << endl;
             }
-        } while (input[sym] != '#' && sym < input.size());
-        cout << input << (judge ? "success" : "failed") << endl;
+#ifdef DEBUG
+            cout << str_stack << " " << input.substr(sym, input.size()) << endl;
+#endif
+        } while (sym < input.size());
+        cout << input.substr(0, input.size() - 1) << " "
+             << (str_stack.length() == 3 && str_stack[0] == '#' && str_stack[2] == '#' ? "success" : "failed")
+             << endl;
     }
 
 }
