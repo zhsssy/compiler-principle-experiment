@@ -7,7 +7,7 @@
 
 #include <exception>
 
-class ReduceException : std::exception {
+class ReduceException : public std::exception {
 private:
 public:
     ReduceException() = default;

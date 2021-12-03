@@ -163,23 +163,23 @@ void LL1Analysis::make_first() {
         char left = it.first;
         for (auto a: right) {
             // 从 vt 中查找 文法中第一个a[0] 是否存在 存在则加入 first
-            if (g.get_vt().count(a[0]) != 0) {
+            if (g.get_vt().count(a[0]) != 0)
                 temp.insert(a[0]);
-            }
+
             // X→ε 则ε∈FIRST(x)
-            if (a == "@") {
+            if (a == "@")
                 temp.insert('@');
-            }
+
         }
-        if (first[left].empty()) {
+        if (first[left].empty())
             first[left] = temp;
-        } else
+        else
             first[left].insert(temp.begin(), temp.end());
     }
 
 
     //3.对X→Y0Y1…….Yk(且Y0 ∈Vn), 反复使用以下直到每一个FIRST(X)不再增大为止
-    // 开辟大小为 vn.size() 的空间 临时存储 vn 个 first 集
+    // 开辟大小为 vn.size() 的空间 临时存储 vn.size() 个 first 集
     // 循环求解直到不再增大
     set<char> temp[g.get_vn().size()];
     size_t k = 0, first_size = 0;
@@ -351,8 +351,8 @@ void LL1Analysis::make_follow() {
     }
 }
 
-//    1. for  ∀ a ∈ FIRST(α)， 将 A -> α 填入 M [A, a ];
-//    2. if（ε ∈ FIRST(α)） ∀ a ∈ FOLLOW (A) ， 将 A -> ε 填入 M [A, a ]; PS: 这里的 a 包括 #
+//   1. for ∀ a ∈ FIRST(α)， 将 A -> α 填入 M [A, a ];
+//   2. if（ε ∈ FIRST(α)） ∀ a ∈ FOLLOW (A)，将 A -> ε 填入 M [A, a ]; a 包括 #
 void LL1Analysis::make_table() {
     string action;
     for (auto it_vn: g.get_vn()) {

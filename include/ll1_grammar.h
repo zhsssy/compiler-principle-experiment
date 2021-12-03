@@ -60,10 +60,10 @@ public:
             // 保存临时结果  判断推入 input 栈中的词法类型
             LEXICAL_RESULT la_temp = l.get_result();
             // 将标识符和数字转换为 i ，便于分析
-            if (is_input(la_temp))
+            if (LexicalAnalysis::is_input(la_temp))
                 input.push("i");
 
-            if (is_key(la_temp) && l.get_token() != ";")
+            if (LexicalAnalysis::is_key(la_temp) && l.get_token() != ";")
                 input.push(l.get_token());
         }
     }
@@ -90,19 +90,6 @@ public:
 
     inline void pop_together() {
         input.pop(), symbol.pop();
-    }
-
-    // 10进制 8进制 16进制 标识符
-    static bool is_input(LEXICAL_RESULT r) {
-        return r == LEXICAL_RESULT::HEX
-               || r == LEXICAL_RESULT::OCT
-               || r == LEXICAL_RESULT::DIGIT
-               || r == LEXICAL_RESULT::IDENTIFICATION;
-    }
-
-    // 为 运算符 或 界符
-    static bool is_key(LEXICAL_RESULT r) {
-        return r == LEXICAL_RESULT::KEY;
     }
 
     // 清空 stack 开始下个句子分析

@@ -93,7 +93,6 @@ void grammar::set_start(const VN_TYPE s) {
     start = s;
 }
 
-
 void grammar::print_production() {
     for (ProPair pair: production) {
         string tmp;
@@ -156,6 +155,10 @@ void grammar::construct_LL1() {
 
 const VN_TYPE grammar::fuzzy_reduced(const string &str) const {
     size_t index;
+#ifdef DEBUG
+    cout << "start reduce: " << str << endl;
+#endif
+    cout << "reduce: " << str << endl;
     for (const VN_TYPE one: vn)
         for (auto pro: production.find(one)->second)
             if (str.size() == pro.size()) {
