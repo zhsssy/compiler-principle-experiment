@@ -65,6 +65,8 @@ public:
 
     const VT_TYPE fuzzy_reduced(const string &str) const;
 
+    VT_TYPE standard_reduce(const string &str) const;
+
     void print_production();
 
 private:
@@ -158,9 +160,9 @@ const VN_TYPE grammar::fuzzy_reduced(const string &str) const {
 #ifdef DEBUG
     cout << "start reduce: " << str << endl;
 #endif
-    // 遍历文法
+    // 遍历
     for (const VN_TYPE one: vn)
-        // 每个非终结符对应的文法
+        // 每个非终结符对应的产生式
         for (auto pro: production.find(one)->second)
             // 如果大小相同开始比较
             if (str.size() == pro.size()) {

@@ -4,6 +4,8 @@
 
 #include "operator_grammar.h"
 
+
+
 int main(int argc, char *argv[]) {
     if (argc != 3) {
         printf("Usage: %s \"input filename\" \"output filename\"\n", argv[0]);
@@ -26,6 +28,7 @@ int main(int argc, char *argv[]) {
     size_t sym;
     char SYM, Q;
     string str_stack;
+    stack<string> cal_stack;
 
     if (!l.is_open()) {
         cerr << "Input filename isn't exist!" << endl;
@@ -67,6 +70,10 @@ int main(int argc, char *argv[]) {
                         if (j > 0 && (str_stack.at(j - 1) == '#' || g.is_vt(str_stack.at(j - 1)))) j = j - 1;
                         else j = j - 2;
                     } while (priority_judgement(str_stack.at(j), Q) != -1);
+                    // 求出子串的长度 不是普适方法 构造 AST 便于中间代码求解
+                    // 以下求法为特定解法
+                    int temp_i = k-j-1;
+                    // 规范规约
                     N = g.fuzzy_reduced(str_stack.substr(j + 1, k));
                     str_stack = str_stack.erase(j + 1, k - j);
                     k = j + 1;
