@@ -76,7 +76,7 @@ public:
 
     void make_table();
 
-    void analysis();
+    void analysis(const char* filename);
 
     void analysis_single();
 
@@ -389,8 +389,8 @@ void LL1Analysis::make_table() {
 }
 
 // 调取词法分析器
-void LL1Analysis::analysis() {
-    LexicalAnalysis l("../../../resource/expression.txt");
+void LL1Analysis::analysis(const char *filename) {
+    LexicalAnalysis l(filename);
 
     if (!l.is_open()) {
         cout << "Can't open file." << endl;
