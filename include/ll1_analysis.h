@@ -154,7 +154,7 @@ void LL1Analysis::make_first() {
     }
 
     //遍历规则rule
-    //2.若X∈Vn,有X→aα,(a∈Vt)或/和X→ε 则a或/和ε∈FIRST(x)
+    //2.若X∈Vn,有X→aα,(a∈Vt)和X→ε 则a和ε∈FIRST(x)
     for (auto &it: g.get_production()) {
         //用temp记录it->first对应的first集
         set<char> temp;
