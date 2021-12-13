@@ -11,15 +11,25 @@ class Node {
 public:
     char sym;
     int val;
-    bool hasVal;
+    bool isDigit;
 
     Node() = default;
 
-    Node(char sym) : sym(sym), hasVal(false) {}
+    Node(char sym) : sym(sym), isDigit(false) {}
 
-    Node(char sym, int val) : sym(sym), val(val), hasVal(true) {}
+    Node(char sym, int val) : sym(sym), val(val), isDigit(true) {}
 
+    Node(char sym, bool isDigit) : sym(sym), val(0), isDigit(isDigit) {}
+
+    Node(char sym, int val, bool isDigit) : sym(sym), val(val), isDigit(isDigit) {}
 };
+
+bool isNumber(const string &str) {
+    for (char const &c: str)
+        if (std::isdigit(c) == 0) return false;
+
+    return true;
+}
 
 
 int main(int argc, char *argv[]) {
@@ -54,6 +64,7 @@ int main(int argc, char *argv[]) {
     vector<vector<Node>> inputs;
     vector<Node> nodes;
     string temp_inputs;
+    bool if_digit = true;
     while (l.scan()) {
         if (l.get_token().at(0) == ';') {
             nodes.emplace_back(Node('#', 0));
@@ -62,13 +73,20 @@ int main(int argc, char *argv[]) {
         }
         if (LexicalAnalysis::is_input(l.get_result())) {
             // 值转换 使用 Node 构造栈
-            nodes.emplace_back(Node('i', stoi(l.get_token())));
+            if (!isNumber(l.get_token()))
+                nodes.emplace_back(Node('i', 0, false));
+            else
+                nodes.emplace_back(Node('i', stoi(l.get_token())));
         } else if (LexicalAnalysis::is_key(l.get_result()) && l.get_token() != ";") {
             nodes.emplace_back(l.get_token().at(0));
         }
     }
 
     for (const auto &input: inputs) {
+        if_digit = true;
+        for (auto ii: input)
+            if (ii.sym == 'i' && !ii.isDigit)
+                if_digit = false;
         k = 0;
         str_stack.clear();
         str_stack.emplace_back(Node('#', 0));
@@ -87,32 +105,30 @@ int main(int argc, char *argv[]) {
                         else j = j - 2;
                     } while (priority_judgement(str_stack.at(j).sym, Q) != -1);
                     int temp_i = k - j;
-                    //                    N = g.fuzzy_reduced(str_stack.substr(j + 1, k));
-                    if (temp_i == 3 && str_stack.at(k - 1).sym == '+')
-                        str_stack.at(k).val = str_stack.at(k - 2).val + str_stack.at(k).val;
+                    if (if_digit) {
+                        if (temp_i == 3 && str_stack.at(k - 1).sym == '+')
+                            str_stack.at(k).val = str_stack.at(k - 2).val + str_stack.at(k).val;
 
-                    if (temp_i == 3 && str_stack.at(k - 1).sym == '*')
-                        str_stack.at(k).val = str_stack.at(k - 2).val * str_stack.at(k).val;
+                        if (temp_i == 3 && str_stack.at(k - 1).sym == '*')
+                            str_stack.at(k).val = str_stack.at(k - 2).val * str_stack.at(k).val;
 
-                    if (temp_i == 3 && str_stack.at(k).sym == ')')
-                        str_stack.at(k).val = str_stack.at(k - 1).val;
-
+                        if (temp_i == 3 && str_stack.at(k).sym == ')')
+                            str_stack.at(k).val = str_stack.at(k - 1).val;
+                    }
+                    // 此处如果不使用规范规约会产生问题
                     str_stack.erase(str_stack.begin() + j + 1, str_stack.begin() + k);
                     k = j + 1;
                     str_stack.at(k).sym = 'N';
-                    cout << "k is" << k << " k sym is " << str_stack.at(k).sym << endl;
-//                    str_stack.emplace_back(Node('N'));
-#ifdef DEBUG
-                    cout << "str2 len: " << str_stack.length() << " " << str_stack << endl;
-                    cout << "input: " << input.substr(sym, input.size() - sym) << endl;
-#endif
+//                    cout << "k is" << k << " k sym is " << str_stack.at(k).sym << endl;
                 }
             }
             catch (ReduceException e) {
                 cout << "reduce error" << endl;
+                continue;
             }
             catch (const char *ch) {
-//                cout << input << ch << endl;
+                cout << ch << endl;
+                break;
             }
             try {
                 if (priority_judgement(str_stack.at(j).sym, SYM.sym) != 1) {
@@ -120,10 +136,18 @@ int main(int argc, char *argv[]) {
                     str_stack.emplace_back(SYM);
                 }
             } catch (const char *ch) {
-//                cout << input << ch << endl;
+                cout << ch << endl;
+                break;
             }
         } while (sym < input.size());
-        cout << str_stack.at(1).sym << " " << str_stack.at(1).val << endl;
+        // 结果输出部分
+        if (str_stack.size() == 3 && str_stack.at(0).sym == '#' && str_stack.at(2).sym == '#') {
+            cout << "success" << endl;
+            if (if_digit)
+                cout << str_stack.at(1).val << endl;
+        } else
+            cout << "failed" << endl;
+
     }
 
 }
