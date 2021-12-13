@@ -7,7 +7,7 @@ set(CMAKE_CXX_STANDARD 20)
 # 如果调用 wsl 内 c compiler 没有此bug
 # 必须设置编码
 
-if(NOT APPLE)
+if(WIN)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -fexec-charset=GBK")
 endif()
 include_directories(include)
