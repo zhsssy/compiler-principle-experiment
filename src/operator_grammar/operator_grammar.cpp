@@ -5,13 +5,21 @@
 #include "operator_grammar.h"
 
 #include <utility>
+#include <vector>
+#include <numeric>
+#include <algorithm>
+#include <iterator>
+#include <iostream>
+#include <functional>
+
+using namespace std;
 
 // S SDT
 class Node {
 public:
-    char sym;
-    int val;
-    bool isDigit;
+    char sym{};
+    int val{};
+    bool isDigit{};
 
     Node() = default;
 
@@ -24,11 +32,12 @@ public:
     Node(char sym, int val, bool isDigit) : sym(sym), val(val), isDigit(isDigit) {}
 };
 
-bool isNumber(const string &str) {
-    for (char const &c: str)
-        if (std::isdigit(c) == 0) return false;
-
-    return true;
+// 是否为可计算的数字
+// functional
+inline bool isNumber(const string &str) {
+    return !any_of(
+            str.cbegin(), str.cend(),
+            [](char c) { return isdigit(c) == 0; });
 }
 
 
@@ -38,22 +47,22 @@ int main(int argc, char *argv[]) {
         exit(EXIT_FAILURE);
     }
 
-    // 构造 需要用到辅助函数
     grammar g = create_grammar_by_file(argv[1]);
     LexicalAnalysis l(argv[2]);
     g.print_production();
     cout << "VT: ";
-    for (auto i: g.get_vt()) {
+    for (auto i: g.get_vt())
         cout << i << " ";
-    }
     cout << endl;
 
-    unsigned k, j;
-    char N;
+    unsigned int k, j;
     size_t sym;
     char Q;
     Node SYM;
-    vector<Node> str_stack;
+    vector<Node> str_stack, nodes;
+    vector<vector<Node>> inputs;
+    bool if_digit = true;
+    
 
     if (!l.is_open()) {
         cerr << "Input filename isn't exist!" << endl;
@@ -61,10 +70,6 @@ int main(int argc, char *argv[]) {
     }
 
     // 根据 ; 全部分割再判断
-    vector<vector<Node>> inputs;
-    vector<Node> nodes;
-    string temp_inputs;
-    bool if_digit = true;
     while (l.scan()) {
         if (l.get_token().at(0) == ';') {
             nodes.emplace_back(Node('#', 0));
@@ -73,24 +78,25 @@ int main(int argc, char *argv[]) {
         }
         if (LexicalAnalysis::is_input(l.get_result())) {
             // 值转换 使用 Node 构造栈
+            // TODO: 针对不同进制的转换计算
             if (!isNumber(l.get_token()))
                 nodes.emplace_back(Node('i', 0, false));
             else
                 nodes.emplace_back(Node('i', stoi(l.get_token())));
-        } else if (LexicalAnalysis::is_key(l.get_result()) && l.get_token() != ";") {
+        } else if (LexicalAnalysis::is_key(l.get_result()) && l.get_token() != ";")
             nodes.emplace_back(l.get_token().at(0));
-        }
     }
 
     for (const auto &input: inputs) {
         if_digit = true;
-        for (auto ii: input)
-            if (ii.sym == 'i' && !ii.isDigit)
-                if_digit = false;
-        k = 0;
-        str_stack.clear();
+        // functional 查找是否可以计算
+        if (std::any_of(
+                input.cbegin(), input.cend(),
+                [](Node node) { return node.sym == 'i' && !node.isDigit; }))
+            if_digit = false;
+        // 每轮循环初始化
+        k = 0, str_stack.clear(), sym = 0;
         str_stack.emplace_back(Node('#', 0));
-        sym = 0;
         do {
             SYM = input.at(sym++);
             if (str_stack.at(k).sym == '#' || g.is_vt(str_stack.at(k).sym)) j = k;
@@ -104,29 +110,23 @@ int main(int argc, char *argv[]) {
                         if (j > 0 && (str_stack.at(j - 1).sym == '#' || g.is_vt(str_stack.at(j - 1).sym))) j = j - 1;
                         else j = j - 2;
                     } while (priority_judgement(str_stack.at(j).sym, Q) != -1);
-                    int temp_i = k - j;
-                    if (if_digit) {
-                        if (temp_i == 3 && str_stack.at(k - 1).sym == '+')
+                    unsigned int temp_len = k - j;
+                    if (if_digit && temp_len == 3) {
+                        if (str_stack.at(k - 1).sym == '+')
                             str_stack.at(k).val = str_stack.at(k - 2).val + str_stack.at(k).val;
 
-                        if (temp_i == 3 && str_stack.at(k - 1).sym == '*')
+                        if (str_stack.at(k - 1).sym == '*')
                             str_stack.at(k).val = str_stack.at(k - 2).val * str_stack.at(k).val;
 
-                        if (temp_i == 3 && str_stack.at(k).sym == ')')
+                        if (str_stack.at(k).sym == ')')
                             str_stack.at(k).val = str_stack.at(k - 1).val;
                     }
                     // 此处如果不使用规范规约会产生问题
                     str_stack.erase(str_stack.begin() + j + 1, str_stack.begin() + k);
                     k = j + 1;
                     str_stack.at(k).sym = 'N';
-//                    cout << "k is" << k << " k sym is " << str_stack.at(k).sym << endl;
                 }
-            }
-            catch (ReduceException e) {
-                cout << "reduce error" << endl;
-                continue;
-            }
-            catch (const char *ch) {
+            } catch (const char *ch) {
                 cout << ch << endl;
                 break;
             }
@@ -147,7 +147,6 @@ int main(int argc, char *argv[]) {
                 cout << str_stack.at(1).val << endl;
         } else
             cout << "failed" << endl;
-
     }
 
 }
