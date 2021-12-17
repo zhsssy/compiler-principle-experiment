@@ -76,7 +76,7 @@ public:
 
     void make_table();
 
-    void analysis(const char* filename);
+    void analysis(const char *filename);
 
     void analysis_single();
 

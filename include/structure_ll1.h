@@ -18,8 +18,6 @@ typedef char VN_TYPE;
 typedef map<VN_TYPE, set<string>> Production;
 typedef pair<VN_TYPE, set<string>> ProPair;
 
-// lexical -> structure ll1 -> ll1 analysis table construct -> ll1 analysis
-
 class grammar {
 private:
     set<VT_TYPE> vt;
@@ -64,8 +62,6 @@ public:
     void construct_LL1();
 
     const VT_TYPE fuzzy_reduced(const string &str) const;
-
-    VT_TYPE standard_reduce(const string &str) const;
 
     void print_production();
 
@@ -157,9 +153,6 @@ void grammar::construct_LL1() {
 
 const VN_TYPE grammar::fuzzy_reduced(const string &str) const {
     size_t index;
-#ifdef DEBUG
-    cout << "start reduce: " << str << endl;
-#endif
     // 遍历
     for (const VN_TYPE one: vn)
         // 每个非终结符对应的产生式
@@ -181,9 +174,8 @@ void grammar::eliminate_left_recursion() {
     set<VN_TYPE>::const_iterator vn_j_citer;
 
     for (vn_i_citer = vn.cbegin(); vn_i_citer != vn.cend(); ++vn_i_citer) {
-        for (vn_j_citer = vn.cbegin(); vn_j_citer != vn_i_citer; ++vn_j_citer) {
+        for (vn_j_citer = vn.cbegin(); vn_j_citer != vn_i_citer; ++vn_j_citer)
             eliminate_indirect_recursion(*vn_i_citer, *vn_j_citer);
-        }
         eliminate_one_left_recursion(*vn_i_citer);
     }
 
