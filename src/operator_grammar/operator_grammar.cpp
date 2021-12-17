@@ -62,7 +62,8 @@ int main(int argc, char *argv[]) {
     vector<Node> str_stack, nodes;
     vector<vector<Node>> inputs;
     bool if_digit = true;
-    
+    string print_str, sub;
+    char N;
 
     if (!l.is_open()) {
         cerr << "Input filename isn't exist!" << endl;
@@ -110,6 +111,9 @@ int main(int argc, char *argv[]) {
                         if (j > 0 && (str_stack.at(j - 1).sym == '#' || g.is_vt(str_stack.at(j - 1).sym))) j = j - 1;
                         else j = j - 2;
                     } while (priority_judgement(str_stack.at(j).sym, Q) != -1);
+                    for (int i = 0; i < str_stack.size(); i++)
+                        print_str += str_stack.at(i).sym;
+                    print_str = "";
                     unsigned int temp_len = k - j;
                     if (if_digit && temp_len == 3) {
                         if (str_stack.at(k - 1).sym == '+')
@@ -121,13 +125,20 @@ int main(int argc, char *argv[]) {
                         if (str_stack.at(k).sym == ')')
                             str_stack.at(k).val = str_stack.at(k - 1).val;
                     }
-                    // 此处如果不使用规范规约会产生问题
+                    sub = "";
+                    for (auto i = j + 1; i < j + k + 1 && i < str_stack.size(); i++)
+                        sub += str_stack.at(i).sym;
+                    N = g.fuzzy_reduced(sub);
                     str_stack.erase(str_stack.begin() + j + 1, str_stack.begin() + k);
                     k = j + 1;
-                    str_stack.at(k).sym = 'N';
+                    str_stack.at(k).sym = N;
                 }
-            } catch (const char *ch) {
-                cout << ch << endl;
+            } catch (ReduceException &e) {
+                cout << "找不到对应产生式  ";
+                break;
+            }
+            catch (const char *ch) {
+                cout << ch << "  ";
                 break;
             }
             try {
@@ -142,9 +153,11 @@ int main(int argc, char *argv[]) {
         } while (sym < input.size());
         // 结果输出部分
         if (str_stack.size() == 3 && str_stack.at(0).sym == '#' && str_stack.at(2).sym == '#') {
-            cout << "success" << endl;
+            cout << "success  ";
             if (if_digit)
                 cout << str_stack.at(1).val << endl;
+            else
+                cout << endl;
         } else
             cout << "failed" << endl;
     }
