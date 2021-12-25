@@ -49,9 +49,9 @@ public:
 
         token_init();
 
-        if (isalpha(*p)) {
+        if (isalpha(*p) || *p == '_') {
             add();
-            while (isalnum(*p))
+            while (isalnum(*p) || *p == '_')
                 add();
 
             if (iskeyword()) result = KEY;
